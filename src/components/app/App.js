@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 // подключаем компоненты
 import AppHeader from '../header'; // header приложения
 import TransitList from '../transit-list'; // список вссех транзитов
+import TransitInfoModal from '../transit-info-modal';
 
 export default class App extends Component {
   constructor() {
@@ -38,6 +39,8 @@ export default class App extends Component {
           atiCode: '70714',
         },
       ],
+      currentTransitInfo: {},
+      transitInfo: false,
     };
 
     this.deleteTransit = id => {
@@ -54,21 +57,52 @@ export default class App extends Component {
         };
       });
     };
+
+    this.setCurrentTransitInfo = id => {
+      this.setState(({ transitList, transitInfo, currentTransitInfo }) => {
+        const idx = transitList.findIndex(el => el.id === id);
+        const newCurrentTransitInfo = transitList[idx];
+        const newTransitInfo = !transitInfo;
+
+        return {
+          transitInfo: newTransitInfo,
+          currentTransitInfo: newCurrentTransitInfo,
+        };
+      });
+    };
+
+    this.onInfoClose = () => {
+      this.setState(({ transitInfo, currentTransitInfo }) => {
+        const newTransitInfo = !transitInfo;
+        const newCurrentTransitInfo = {};
+
+        return {
+          transitInfo: newTransitInfo,
+          currentTransitInfo: newCurrentTransitInfo,
+        };
+      });
+    };
   }
 
   render() {
-    const { transitList } = this.state;
+    const { transitList, currentTransitInfo, transitInfo } = this.state;
 
     return (
-      <div>
+      <div className="app">
         <AppHeader />
         <div className="container">
           <h1 className="mt-3 mb-3 text-center">Заявки на грузоперевозки</h1>
           <TransitList
             transitList={transitList}
             onDeleted={this.deleteTransit}
+            onShowInfo={this.setCurrentTransitInfo}
           />
         </div>
+        <TransitInfoModal
+          currentTransitInfo={currentTransitInfo}
+          transitInfo={transitInfo}
+          onInfoClose={this.onInfoClose}
+        />
       </div>
     );
   }
