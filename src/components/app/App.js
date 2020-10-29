@@ -39,6 +39,21 @@ export default class App extends Component {
         },
       ],
     };
+
+    this.deleteTransit = id => {
+      this.setState(({ transitList }) => {
+        const idx = transitList.findIndex(el => el.id === id);
+
+        const newTransits = [
+          ...transitList.slice(0, idx),
+          ...transitList.slice(idx + 1),
+        ];
+
+        return {
+          transitList: newTransits,
+        };
+      });
+    };
   }
 
   render() {
@@ -49,7 +64,10 @@ export default class App extends Component {
         <AppHeader />
         <div className="container">
           <h1 className="mt-3 mb-3 text-center">Заявки на грузоперевозки</h1>
-          <TransitList transitList={transitList} />
+          <TransitList
+            transitList={transitList}
+            onDeleted={this.deleteTransit}
+          />
         </div>
       </div>
     );

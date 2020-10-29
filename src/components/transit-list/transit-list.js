@@ -2,11 +2,18 @@ import React from 'react';
 
 import TransitItem from '../transit-item';
 
-const TransitList = ({ transitList }) => {
+const TransitList = ({ transitList, onDeleted }) => {
   const elements = transitList.map(item => {
     const { id, ...itemProps } = item;
 
-    return <TransitItem key={id} id={id} {...itemProps} />;
+    return (
+      <TransitItem
+        key={id}
+        id={id}
+        {...itemProps}
+        onDeleted={() => onDeleted(id)}
+      />
+    );
   });
 
   return (
