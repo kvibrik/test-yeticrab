@@ -3,7 +3,8 @@ import React, { Component } from 'react';
 // подключаем компоненты
 import AppHeader from '../header'; // header приложения
 import TransitList from '../transit-list'; // список вссех транзитов
-import TransitInfoModal from '../transit-info-modal';
+import TransitInfoModal from '../transit-info-modal'; // модалка с информацией о заявке
+import TransitEditModal from '../transit-modal-edit';
 
 export default class App extends Component {
   constructor() {
@@ -13,7 +14,7 @@ export default class App extends Component {
       transitList: [
         {
           id: 1,
-          date: '2020-11-05T12:30',
+          date: new Date(),
           clientName: 'ТД "Рога и Копыта"',
           carrierFullName: 'Петров Петр Петрович',
           carrierPhone: '+79665554433',
@@ -22,7 +23,7 @@ export default class App extends Component {
         },
         {
           id: 2,
-          date: '2020-11-01T11:00',
+          date: new Date(),
           clientName: 'ООО "Василек"',
           carrierFullName: 'Деловой портал',
           carrierPhone: '+79665554433',
@@ -31,7 +32,7 @@ export default class App extends Component {
         },
         {
           id: 3,
-          date: '2020-12-01T14:00',
+          date: new Date(),
           clientName: 'ООО "Работа не волк"',
           carrierFullName: 'БАСАТИ СПЕДИШН',
           carrierPhone: '+79665554433',
@@ -39,10 +40,20 @@ export default class App extends Component {
           atiCode: '70714',
         },
       ],
-      currentTransitInfo: {},
+      currentTransitInfo: {
+        id: '',
+        date: '',
+        clientName: '',
+        carrierFullName: '',
+        carrierPhone: '',
+        comments: '',
+        atiCode: '',
+      },
       transitInfo: false,
+      transitEdit: false,
     };
 
+    // удаление заявки на доставку
     this.deleteTransit = id => {
       this.setState(({ transitList }) => {
         const idx = transitList.findIndex(el => el.id === id);
@@ -58,8 +69,34 @@ export default class App extends Component {
       });
     };
 
+    // редактирование заявки на доставку
+    this.onTransitEdit = transit => {
+      this.setState(({ transitList, transitEdit }) => {
+        const idx = transitList.findIndex(el => el.id === transit.id);
+        const newTransitList = [...transitList];
+        newTransitList[idx] = transit;
+
+        const newTransitEdit = !transitEdit;
+
+        return {
+          transitList: newTransitList,
+          transitEdit: newTransitEdit,
+          currentTransitInfo: {
+            id: '',
+            date: '',
+            clientName: '',
+            carrierFullName: '',
+            carrierPhone: '',
+            comments: '',
+            atiCode: '',
+          },
+        };
+      });
+    };
+
+    // запись в стейт выбранной заявки для просмотра
     this.setCurrentTransitInfo = id => {
-      this.setState(({ transitList, transitInfo, currentTransitInfo }) => {
+      this.setState(({ transitList, transitInfo }) => {
         const idx = transitList.findIndex(el => el.id === id);
         const newCurrentTransitInfo = transitList[idx];
         const newTransitInfo = !transitInfo;
@@ -70,7 +107,20 @@ export default class App extends Component {
         };
       });
     };
+    this.setCurrentTransitEdit = id => {
+      this.setState(({ transitList, transitEdit, currentTransitInfo }) => {
+        const idx = transitList.findIndex(el => el.id === id);
+        const newCurrentTransitInfo = transitList[idx];
+        const newTransitEdit = !transitEdit;
 
+        return {
+          transitEdit: newTransitEdit,
+          currentTransitInfo: newCurrentTransitInfo,
+        };
+      });
+    };
+
+    // закрытие модалки с информацией о заявке
     this.onInfoClose = () => {
       this.setState(({ transitInfo, currentTransitInfo }) => {
         const newTransitInfo = !transitInfo;
@@ -82,10 +132,27 @@ export default class App extends Component {
         };
       });
     };
+    // закрытие модалки с информацией о заявке
+    this.onEditClose = () => {
+      this.setState(({ transitEdit, currentTransitInfo }) => {
+        const newTransitEdit = !transitEdit;
+        const newCurrentTransitInfo = {};
+
+        return {
+          transitEdit: newTransitEdit,
+          currentTransitInfo: newCurrentTransitInfo,
+        };
+      });
+    };
   }
 
   render() {
-    const { transitList, currentTransitInfo, transitInfo } = this.state;
+    const {
+      transitList,
+      currentTransitInfo,
+      transitInfo,
+      transitEdit,
+    } = this.state;
 
     return (
       <div className="app">
@@ -96,12 +163,20 @@ export default class App extends Component {
             transitList={transitList}
             onDeleted={this.deleteTransit}
             onShowInfo={this.setCurrentTransitInfo}
+            onEdit={this.setCurrentTransitEdit}
           />
         </div>
         <TransitInfoModal
           currentTransitInfo={currentTransitInfo}
           transitInfo={transitInfo}
           onInfoClose={this.onInfoClose}
+        />
+        <TransitEditModal
+          transitEdit={transitEdit}
+          onEditClose={this.onEditClose}
+          currentTransitInfo={currentTransitInfo}
+          onTransitEdit={this.onTransitEdit}
+          transitId={currentTransitInfo.id}
         />
       </div>
     );

@@ -6,13 +6,15 @@ import './transit-info-modal.css';
 export default class TransitInfoModal extends Component {
   render() {
     const { currentTransitInfo, transitInfo, onInfoClose } = this.props;
+    // форматирование даты
     const formatDate = moment(new Date(currentTransitInfo.date)).format(
       'YYYY.MM.DD HH:mm',
     );
+    // форматирование ссылки на ати-код
     const atiLink = `https://ati.su/firms/${currentTransitInfo.atiCode}/info`;
 
+    // добавление класса, когда открывается модалка
     let classNames = 'transit-info modal';
-
     if (transitInfo) {
       classNames += ' d-block';
     }

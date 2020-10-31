@@ -2,7 +2,7 @@ import React from 'react';
 
 import TransitItem from '../transit-item';
 
-const TransitList = ({ transitList, onDeleted, onShowInfo }) => {
+const TransitList = ({ transitList, onDeleted, onShowInfo, onEdit }) => {
   const elements = transitList.map(item => {
     const { id, ...itemProps } = item;
 
@@ -13,6 +13,7 @@ const TransitList = ({ transitList, onDeleted, onShowInfo }) => {
         {...itemProps}
         onDeleted={() => onDeleted(id)}
         onShowInfo={() => onShowInfo(id)}
+        onEdit={() => onEdit(id)}
       />
     );
   });
