@@ -5,6 +5,7 @@ import AppHeader from '../header'; // header приложения
 import TransitList from '../transit-list'; // список вссех транзитов
 import TransitInfoModal from '../transit-info-modal'; // модалка с информацией о заявке
 import TransitEditModal from '../transit-modal-edit';
+import TransitAddModal from '../transit-add-modal';
 
 export default class App extends Component {
   constructor() {
@@ -51,6 +52,8 @@ export default class App extends Component {
       },
       transitInfo: false,
       transitEdit: false,
+      transitAdd: false,
+      newTransitId: null,
     };
 
     // удаление заявки на доставку
@@ -107,8 +110,10 @@ export default class App extends Component {
         };
       });
     };
+    // костыльное решение для записи в стейт заявки для редактирования
+    // по-хорошему нужно одну функцию для setCurrentTransitInfo и setCurrentTransitEdit
     this.setCurrentTransitEdit = id => {
-      this.setState(({ transitList, transitEdit, currentTransitInfo }) => {
+      this.setState(({ transitList, transitEdit }) => {
         const idx = transitList.findIndex(el => el.id === id);
         const newCurrentTransitInfo = transitList[idx];
         const newTransitEdit = !transitEdit;
@@ -122,7 +127,7 @@ export default class App extends Component {
 
     // закрытие модалки с информацией о заявке
     this.onInfoClose = () => {
-      this.setState(({ transitInfo, currentTransitInfo }) => {
+      this.setState(({ transitInfo }) => {
         const newTransitInfo = !transitInfo;
         const newCurrentTransitInfo = {};
 
@@ -134,13 +139,52 @@ export default class App extends Component {
     };
     // закрытие модалки с информацией о заявке
     this.onEditClose = () => {
-      this.setState(({ transitEdit, currentTransitInfo }) => {
+      this.setState(({ transitEdit }) => {
         const newTransitEdit = !transitEdit;
         const newCurrentTransitInfo = {};
 
         return {
           transitEdit: newTransitEdit,
           currentTransitInfo: newCurrentTransitInfo,
+        };
+      });
+    };
+
+    // открытие модалки для добавления заявки
+    this.showAddModal = () => {
+      this.setState(({ transitAdd }) => {
+        const transitId = Math.floor(Math.random() * 10000000);
+        const newTransitAdd = !transitAdd;
+
+        return {
+          transitAdd: newTransitAdd,
+          newTransitId: transitId,
+        };
+      });
+    };
+
+    // Добавление новой заявки
+    this.onTransitAdd = transit => {
+      this.setState(({ transitList, transitAdd }) => {
+        const newTransitList = [...transitList, { ...transit }];
+        const newtransitAdd = !transitAdd;
+
+        console.log(newTransitList);
+
+        return {
+          transitList: newTransitList,
+          transitAdd: newtransitAdd,
+        };
+      });
+    };
+
+    this.onAddClose = () => {
+      this.setState(({ transitAdd }) => {
+        const newTransitAdd = !transitAdd;
+
+        return {
+          transitAdd: newTransitAdd,
+          newTransitId: null,
         };
       });
     };
@@ -152,6 +196,8 @@ export default class App extends Component {
       currentTransitInfo,
       transitInfo,
       transitEdit,
+      transitAdd,
+      newTransitId,
     } = this.state;
 
     return (
@@ -159,6 +205,11 @@ export default class App extends Component {
         <AppHeader />
         <div className="container">
           <h1 className="mt-3 mb-3 text-center">Заявки на грузоперевозки</h1>
+          <button
+            className="btn btn-primary m-3 ml-auto d-block"
+            onClick={this.showAddModal}>
+            Добавить новую заявку
+          </button>
           <TransitList
             transitList={transitList}
             onDeleted={this.deleteTransit}
@@ -177,6 +228,13 @@ export default class App extends Component {
           currentTransitInfo={currentTransitInfo}
           onTransitEdit={this.onTransitEdit}
           transitId={currentTransitInfo.id}
+        />
+
+        <TransitAddModal
+          transitAdd={transitAdd}
+          newTransitId={newTransitId}
+          onTransitAdd={this.onTransitAdd}
+          onAddClose={this.onAddClose}
         />
       </div>
     );

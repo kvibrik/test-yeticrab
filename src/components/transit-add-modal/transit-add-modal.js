@@ -4,15 +4,22 @@ import ru from 'date-fns/locale/ru';
 
 import 'react-datepicker/dist/react-datepicker.css';
 
-import './transit-modal-edit.css';
+import './transit-add-modal.css';
 
-export default class TransitEditModal extends Component {
+export default class TransitAddModal extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      transit: this.props.currentTransitInfo,
-      transitId: this.props.transitId,
+      transit: {
+        id: this.props.newTransitId,
+        date: '',
+        clientName: '',
+        carrierFullName: '',
+        carrierPhone: '',
+        comments: '',
+        atiCode: '',
+      },
     };
 
     this.onItemChange = (value, field) => {
@@ -56,7 +63,7 @@ export default class TransitEditModal extends Component {
       e.preventDefault();
       const { transit } = this.state;
 
-      this.props.onTransitEdit(transit);
+      this.props.onTransitAdd(transit);
       this.setState({
         transit: {
           atiCode: '',
@@ -72,30 +79,31 @@ export default class TransitEditModal extends Component {
   }
 
   static getDerivedStateFromProps(props, state) {
-    if (props.currentTransitInfo.id !== state.transitId) {
+    if (props.newTransitId !== state.transit.id) {
+      const newTransit = { ...state.transit, id: props.newTransitId };
+
       return {
-        transitId: props.currentTransitInfo.id,
-        transit: props.currentTransitInfo,
+        transit: newTransit,
       };
     }
     return null;
   }
 
   render() {
-    const { transitEdit, onEditClose } = this.props;
+    const { transitAdd, onAddClose } = this.props;
     const { transit } = this.state;
 
     // добавление класса, когда открывается модалка
-    let classNames = 'transit-edit modal';
-    if (transitEdit) {
+    let classNames = 'transit-add modal';
+    if (transitAdd) {
       classNames += ' d-block';
     }
 
     return (
       <div className={classNames}>
-        <div className="transit-edit__body modal-body">
+        <div className="transit-add__body modal-body">
           <form
-            className="transit-edit__content modal-content"
+            className="transit-add__content modal-content"
             onSubmit={this.onSubmit}>
             <svg
               width="1.3em"
@@ -104,15 +112,13 @@ export default class TransitEditModal extends Component {
               className="bi bi-x-circle-fill text-danger close pointer"
               fill="currentColor"
               xmlns="http://www.w3.org/2000/svg"
-              onClick={onEditClose}>
+              onClick={onAddClose}>
               <path
                 fillRule="evenodd"
                 d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"
               />
             </svg>
-            <h4>
-              Редактирование заявки № <b>{transit.id}</b>
-            </h4>
+            <h4>Создание новой заявки № {transit.id}</h4>
             <div className="mt-2 row align-items-center">
               <div className="col">
                 <label htmlFor="date" className="form-label">
@@ -145,6 +151,7 @@ export default class TransitEditModal extends Component {
                   id="client-name"
                   value={transit.clientName}
                   onChange={this.onNameChange}
+                  required
                 />
               </div>
             </div>
@@ -161,6 +168,7 @@ export default class TransitEditModal extends Component {
                   id="carrier-name"
                   value={transit.carrierFullName}
                   onChange={this.onCarrierFullNameChange}
+                  required
                 />
               </div>
             </div>
@@ -177,6 +185,7 @@ export default class TransitEditModal extends Component {
                   id="carrier-phone"
                   value={transit.carrierPhone}
                   onChange={this.onCarrierPhoneChange}
+                  required
                 />
               </div>
             </div>
@@ -209,11 +218,12 @@ export default class TransitEditModal extends Component {
                   id="ati"
                   value={transit.atiCode}
                   onChange={this.onAtiChange}
+                  required
                 />
               </div>
             </div>
             <button type="submit" className="btn btn-primary mt-3 w-25 ml-auto">
-              Сохранить
+              Создать
             </button>
           </form>
         </div>
