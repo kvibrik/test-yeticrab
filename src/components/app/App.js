@@ -153,6 +153,7 @@ export default class App extends Component {
     // открытие модалки для добавления заявки
     this.showAddModal = () => {
       this.setState(({ transitAdd }) => {
+        // по сути Id должен приходить от сервера. Но без сервера - заглушка
         const transitId = Math.floor(Math.random() * 10000000);
         const newTransitAdd = !transitAdd;
 

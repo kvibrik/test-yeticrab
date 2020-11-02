@@ -22,6 +22,8 @@ export default class TransitAddModal extends Component {
       },
     };
 
+    // универсальная функция для изменения стейта,
+    // чтобы сделать все инпуты контролируемыми
     this.onItemChange = (value, field) => {
       this.setState(({ transit }) => {
         const newTransit = { ...transit };
@@ -59,6 +61,9 @@ export default class TransitAddModal extends Component {
       this.onItemChange(e.target.value, 'atiCode');
     };
 
+    // при сохранении новой заявки
+    // в глобальный стейт отправляются данные
+    // там уже добавляется новая заявка и перерендеривается приложение
     this.onSubmit = e => {
       e.preventDefault();
       const { transit } = this.state;
@@ -78,6 +83,7 @@ export default class TransitAddModal extends Component {
     };
   }
 
+  // проверка на соответствие id в стейте с id, который приходит в пропсах
   static getDerivedStateFromProps(props, state) {
     if (props.newTransitId !== state.transit.id) {
       const newTransit = { ...state.transit, id: props.newTransitId };
